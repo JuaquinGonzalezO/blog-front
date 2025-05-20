@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AcademicCapIcon, PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-
+import api from '../../api'; 
 
 export default function CursosList() {
   const [cursos, setCursos] = useState([]);
@@ -10,8 +10,8 @@ export default function CursosList() {
 
   const fetchCursos = async () => {
     try {
-      const response = await api.get('/curso');
-      setCursos(response.data.cursos);
+      const response = await api.get('/cursos/cursos'); // Ajusta la ruta según tu backend
+      setCursos(response.data); // Ajusta según la estructura de tu respuesta
     } catch (err) {
       setError(err.message || 'Error al cargar cursos');
     } finally {
@@ -21,8 +21,8 @@ export default function CursosList() {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/curso/${id}`);
-      fetchCursos();
+      await api.delete(`/cursos/${id}`); // Ajusta la ruta según tu backend
+      fetchCursos(); // Recarga la lista después de eliminar
     } catch (err) {
       setError('Error al eliminar curso');
       console.error('Error al eliminar curso:', err);
@@ -41,7 +41,7 @@ export default function CursosList() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Cursos</h1>
         <Link
-          to="/curso/nuevo"
+          to="/cursos/nuevo"
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
         >
           <PlusIcon className="h-5 w-5 mr-1" />
@@ -59,28 +59,36 @@ export default function CursosList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-slate-200">
-            {cursos.map((curso) => (
-              <tr key={curso._id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-800">{curso.nombre}</td>
-                <td className="px-6 py-4 text-slate-600">{curso.descripcion}</td>
-                <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                  <Link
-                    to={`/curso/editar/${curso._id}`}
-                    className="text-blue-600 hover:text-blue-800 flex items-center"
-                  >
-                    <PencilIcon className="h-4 w-4 mr-1" />
-                    Editar
-                  </Link>
-                  <button
-                    className="text-red-600 hover:text-red-800 flex items-center"
-                    onClick={() => handleDelete(curso._id)}
-                  >
-                    <TrashIcon className="h-4 w-4 mr-1" />
-                    Eliminar
-                  </button>
+            {cursos.length > 0 ? (
+              cursos.map((curso) => (
+                <tr key={curso._id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-800">{curso.nombre}</td>
+                  <td className="px-6 py-4 text-slate-600">{curso.descripcion}</td>
+                  <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                    <Link
+                      to={`/cursos/editar/${curso._id}`}
+                      className="text-blue-600 hover:text-blue-800 flex items-center"
+                    >
+                      <PencilIcon className="h-4 w-4 mr-1" />
+                      Editar
+                    </Link>
+                    <button
+                      className="text-red-600 hover:text-red-800 flex items-center"
+                      onClick={() => handleDelete(curso._id)}
+                    >
+                      <TrashIcon className="h-4 w-4 mr-1" />
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="px-6 py-4 text-center text-slate-500">
+                  No hay cursos disponibles
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

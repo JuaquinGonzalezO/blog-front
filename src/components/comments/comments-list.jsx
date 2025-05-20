@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChatBubbleLeftIcon, UserIcon, CalendarIcon, TrashIcon } from '@heroicons/react/24/outline';
-
+import api from '../../api'; 
 
 export default function CommentsList({ postId }) {
   const [comments, setComments] = useState([]);
@@ -9,7 +9,7 @@ export default function CommentsList({ postId }) {
 
   const fetchComments = async () => {
     try {
-      const response = await api.get(`/comments?publicacionId=${postId}`);
+      const response = await api.get(`/comentario/`);
       setComments(response.data.comments);
     } catch (err) {
       setError(err.message);
@@ -29,7 +29,7 @@ export default function CommentsList({ postId }) {
 
   useEffect(() => {
     fetchComments();
-  }, [postId]);
+  }, []);
 
   if (loading) return <div className="text-center py-4">Cargando comentarios...</div>;
   if (error) return <div className="text-center py-4 text-red-500">Error: {error}</div>;
@@ -56,10 +56,11 @@ export default function CommentsList({ postId }) {
               <p className="text-slate-700 mb-2">{comment.contenido}</p>
               <button 
                 className="text-sm text-red-600 hover:text-red-800 flex items-center"
-                onClick={() => handleDelete(comment._id)}
+                onClick={() => handleDelete(comments._id)}
               >
                 <TrashIcon className="h-4 w-4 mr-1" />
                 Eliminar
+                
               </button>
             </div>
           ))}

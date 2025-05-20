@@ -1,13 +1,15 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import Commentslist from '../../components/comments/comments-list';
+import Commentsform from '../../components/comments/comments-form'  
 
-import CommentsList from '../../components/comments/comments-list';
-
-
-export default function ComentPage() {
+export default function CursoPage() {
   return (
-    <Routes>
-       <Route path="comments" element={<CommentsList />} />
-    </Routes>
+   <Routes>
+     <Route path="/curso" element={<Commentslist />} />
+    <Route path="/cursos/nuevo" element={<Commentsform />} />
+    <Route path="/cursos/editar/:id" element={<Commentsform />} />
+
+  </Routes>
+
   );
 }

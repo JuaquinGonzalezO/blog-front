@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/comentarios";
+const API_URL = "http://localhost:3001/api/comentarios";
 
 export const createComment = async (commentData) => {
   try {
@@ -12,11 +12,9 @@ export const createComment = async (commentData) => {
   }
 };
 
-export const getComments = async (postId) => {
+export const getComments = async () => {
   try {
-    const response = await axios.get(`${API_URL}/`, {
-      params: { publicacionId: postId }
-    });
+    const response = await axios.get(`/`);
     return response.data;
   } catch (error) {
     console.error('Error getting comments:', error);

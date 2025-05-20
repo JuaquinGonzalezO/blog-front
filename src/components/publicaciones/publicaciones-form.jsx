@@ -17,7 +17,7 @@ export default function PublicacionesForm() {
 
   const fetchCursos = async () => {
     try {
-      const response = await api.get('/curso');
+      const response = await api.get('/curso/curso');
       setCursos(response.data.cursos || []);
     } catch (err) {
       console.error('Error fetching courses:', err);
@@ -27,12 +27,12 @@ export default function PublicacionesForm() {
   const fetchPost = async (id) => {
     try {
       const response = await api.get(`/post/${id}`);
-      const post = response.data.post;
+      const post = response.data.post || response.data;
       setFormData({
         titulo: post.titulo,
         descripcion: post.descripcion,
         fechaCreacion: new Date(post.fechaCreacion),
-        cursoId: post.cursoId?._id || ''
+        cursoId: post.cursoId?._id || post.cursoId || ''
       });
     } catch (err) {
       console.error('Error fetching post:', err);
@@ -52,24 +52,38 @@ export default function PublicacionesForm() {
     setFormData({ ...formData, fechaCreacion: date });
   };
 
+  const formatDateForBackend = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const dataToSend = {
-        ...formData,
-        fechaCreacion: formData.fechaCreacion.toISOString()
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        fechaCreacion: formatDateForBackend(formData.fechaCreacion),
+        cursoId: formData.cursoId
       };
 
       if (id) {
         await api.put(`/post/${id}`, dataToSend);
       } else {
-        await api.post('/post', dataToSend);
+        await api.post('/post/create', dataToSend); // Cambiado a /post/create
       }
-      navigate('/posts');  // Corregido: cambiado de '/publicaciones' a '/posts'
+      navigate('/post');
     } catch (err) {
-      console.error('Error saving post:', err);
+      console.error('Error saving post:', err.response?.data || err.message);
+      alert('Error al guardar: ' + (err.response?.data?.message || err.message));
     }
+    window.location.reload(); 
   };
+  useEffect(() => {
+    fetchPublicaciones();
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -78,6 +92,7 @@ export default function PublicacionesForm() {
       </h1>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Campos del formulario se mantienen igual */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Título</label>
           <input
@@ -107,6 +122,7 @@ export default function PublicacionesForm() {
           <DatePicker
             selected={formData.fechaCreacion}
             onChange={handleDateChange}
+            dateFormat="dd/MM/yyyy"
             className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -119,6 +135,7 @@ export default function PublicacionesForm() {
             value={formData.cursoId}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
           >
             <option value="">Seleccione un curso</option>
             {cursos.map((curso) => (
@@ -132,7 +149,7 @@ export default function PublicacionesForm() {
         <div className="flex justify-end space-x-3 pt-4">
           <button
             type="button"
-            onClick={() => navigate('/posts')}  // Corregido: cambiado de '/publicaciones' a '/posts'
+            onClick={() => navigate('/post')}
             className="px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancelar

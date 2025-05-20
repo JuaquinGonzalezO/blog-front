@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-
-
+import React, { useEffect, useState } from 'react';
+import api from '../../api';
 
 export default function CommentsForm({ postId, onCommentAdded }) {
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchComments = async () => {
+    try {
+      const response = await api.get(`/comentario/`);
+      setComments(response.data.comments);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [formData, setFormData] = useState({
     nombreUsuario: '',
     contenido: ''
@@ -14,8 +28,12 @@ export default function CommentsForm({ postId, onCommentAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.nombreUsuario.trim()) {
+      formData.nombreUsuario = 'Anónimo';
+    }
+
     try {
-      await api.post('/comments', {
+      await api.post('/comentario/create', {
         ...formData,
         publicacionId: postId
       });
@@ -24,7 +42,12 @@ export default function CommentsForm({ postId, onCommentAdded }) {
     } catch (err) {
       console.error('Error adding comment:', err);
     }
+    window.location.reload(); 
   };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mt-6">
@@ -38,7 +61,6 @@ export default function CommentsForm({ postId, onCommentAdded }) {
             onChange={handleChange}
             placeholder="Tu nombre"
             className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
           />
         </div>
         <div>

@@ -1,28 +1,25 @@
 import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: "http://127.0.0.1:3000/AlmacenadoraG1/vlm/",
-  timeout: 5000,  
-});
-
-
+const API_URL = "http://localhost:3000/api/cursos";
 
 export const createCurso = async (cursoData) => {
   try {
-    const response = await apiClient.post('/cursos', cursoData);
+    const response = await axios.post(`${API_URL}/create`, cursoData);
     return response.data;
   } catch (error) {
-    console.error('Error al crear el curso:', error);
-    throw error.response?.data || { message: 'Error al crear el curso' };
+    console.error('Error creating course:', error);
+    throw error.response?.data || { success: false, message: 'Error creating course' };
   }
 };
 
-export const getCursos = async () => {
+export const getCursos = async (limite = 10, desde = 0) => {
   try {
-    const res = await axios.get('/api/cursos'); 
-    return { success: true, posts: res.data };
+    const response = await axios.get(`${API_URL}/`, {
+      params: { limite, desde }
+    });
+    return response.data;
   } catch (error) {
-    console.error('Error al obtener los cursos:', error);
-    return { success: false, posts: [] };
+    console.error('Error getting courses:', error);
+    throw error.response?.data || { success: false, message: 'Error getting courses' };
   }
 };

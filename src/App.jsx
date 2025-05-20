@@ -1,15 +1,16 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import PostPage from "./pages/post/PostPage.jsx";
-import PostList from "../src/components/posts/PostList.jsx"
+import CursoPage from "../src/pages/curso/CursoPage";
+import PublicPage from "../src/pages/publicacion/PublicPage";
+import FiltersPage from "../src/pages/filters/FiltersPage";
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<div>Bienvenido a tu Blog personal</div>} />
-        <Route path="/post" element={<PostList />} />
-        <Route path="/post/:postId" element={<PostPage />} />    
-
+        <Route path="cursos/*" element={<CursoPage />} />
+        <Route path="post/*" element={<PublicPage />} /> 
+        <Route path="filters/*" element={<FiltersPage />} />
       </Route>
     </Routes>
   );
